@@ -1,0 +1,81 @@
+@page
+@using examen_parcial.Areas.Identity.Pages.Account
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-university fa-3x text-primary mb-3"></i>
+                    <h2>Acceder al Portal Académico</h2>
+                    <p class="text-muted">Ingresa tus credenciales para continuar</p>
+                </div>
+                
+                <form id="account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                        <label asp-for="Input.Email" class="form-label">
+                            <i class="fas fa-envelope me-2"></i>Email
+                        </label>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                        <label asp-for="Input.Password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Contraseña
+                        </label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                        <label asp-for="Input.RememberMe" class="form-check-label">
+                            <i class="fas fa-remember me-1"></i>@Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid mb-3">
+                        <button id="login-submit" type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="mb-0">
+                            ¿No tienes cuenta? 
+                            <a id="register-link" asp-page="./Register" class="text-decoration-none">
+                                <i class="fas fa-user-plus me-1"></i>Regístrate aquí
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Información de usuarios de prueba -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Usuario de Prueba
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Coordinador:</strong></p>
+                <p class="mb-1">📧 Email: <code>admin@gmail.com</code></p>
+                <p class="mb-0">🔑 Contraseña: <code>Admin2024!</code></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

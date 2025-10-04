@@ -1,8 +1,160 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Portal Académico";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mb-5">
+    <h1 class="display-4">🎓 Portal Académico</h1>
+    <p class="lead">Sistema de Gestión de Cursos y Matrículas Universitarias</p>
 </div>
+
+<div class="row g-4">
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                </div>
+                <h5 class="card-title">👨‍🎓 Para Estudiantes</h5>
+                <p class="card-text">Consulta y matricúlate en los cursos disponibles. Gestiona tu carga académica de manera fácil y rápida.</p>
+                <div class="mt-auto">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Cursos" asp-action="Index" class="btn btn-primary">
+                            <i class="fas fa-book me-2"></i>Ver Cursos Disponibles
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-tie fa-3x text-success"></i>
+                </div>
+                <h5 class="card-title">👨‍💼 Para Coordinadores</h5>
+                <p class="card-text">Administra la oferta académica, supervisa las matrículas y gestiona los cursos del semestre.</p>
+                <div class="mt-auto">
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Coordinador"))
+                    {
+                        <a asp-controller="Admin" asp-action="Index" class="btn btn-success">
+                            <i class="fas fa-cogs me-2"></i>Panel de Control
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-secondary">
+                            <i class="fas fa-lock me-2"></i>Acceso Restringido
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6 mx-auto">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-info-circle fa-3x text-info"></i>
+                </div>
+                <h5 class="card-title">📋 Información</h5>
+                <p class="card-text">Sistema integral de gestión académica diseñado para estudiantes y coordinadores universitarios.</p>
+                <div class="mt-auto">
+                    <a asp-controller="Home" asp-action="Privacy" class="btn btn-info">
+                        <i class="fas fa-question-circle me-2"></i>Más Información
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="welcome-section">
+        <h3>¡Bienvenido/a, @User.Identity.Name! 👋</h3>
+        <p class="mb-2">
+            <i class="fas fa-clock me-2"></i>Último acceso: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+        </p>
+        <p class="mb-0">
+            <i class="fas fa-user-check me-2"></i>
+            @if (User.IsInRole("Coordinador"))
+            {
+                <span>Rol: <strong>Coordinador Académico</strong></span>
+            }
+            else
+            {
+                <span>Rol: <strong>Estudiante</strong></span>
+            }
+        </p>
+    </div>
+}
+else
+{
+    <div class="mt-5 p-4 bg-light rounded">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h4 class="mb-3">🚀 ¿Nuevo en el sistema?</h4>
+                <p class="mb-0">Únete a nuestra plataforma académica y accede a todas las funcionalidades del portal universitario.</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Registrarse
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Sección de estadísticas -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <i class="fas fa-book fa-2x mb-2"></i>
+                        <h5>3</h5>
+                        <small>Cursos Disponibles</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h5>75</h5>
+                        <small>Cupos Totales</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <h5>24/7</h5>
+                        <small>Acceso Disponible</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <i class="fas fa-certificate fa-2x mb-2"></i>
+                        <h5>11</h5>
+                        <small>Créditos Ofertados</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
