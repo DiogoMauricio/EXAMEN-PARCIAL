@@ -332,3 +332,4 @@ C:\Users\User\Desktop\examen parcial\obj\Debug\net9.0\compressed\hy78g284cq-w69l
 C:\Users\User\Desktop\examen parcial\bin\Debug\net9.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
 C:\Users\User\Desktop\examen parcial\bin\Debug\net9.0\Pipelines.Sockets.Unofficial.dll
 C:\Users\User\Desktop\examen parcial\bin\Debug\net9.0\StackExchange.Redis.dll
+C:\Users\User\Desktop\examen parcial\bin\Debug\net9.0\appsettings.Production.json
