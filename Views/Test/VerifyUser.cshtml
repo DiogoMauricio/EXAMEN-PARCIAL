@@ -1,0 +1,48 @@
+@{
+    ViewData["Title"] = "Verificar Usuario";
+}
+
+<div class="container mt-5">
+    <h2>Verificación de Usuario Coordinador</h2>
+    
+    @if (ViewBag.UserExists)
+    {
+        <div class="alert alert-success">
+            <h4>✅ Usuario Encontrado</h4>
+            <p><strong>Email:</strong> @ViewBag.Email</p>
+            <p><strong>UserName:</strong> @ViewBag.UserName</p>
+            <p><strong>Email Confirmado:</strong> @ViewBag.EmailConfirmed</p>
+            <p><strong>Roles:</strong> @ViewBag.Roles</p>
+            <p><strong>Contraseña Correcta:</strong> 
+                @if (ViewBag.PasswordCheck)
+                {
+                    <span class="text-success">✅ SÍ</span>
+                }
+                else
+                {
+                    <span class="text-danger">❌ NO</span>
+                }
+            </p>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5>Credenciales para Login:</h5>
+                <p><strong>Email:</strong> <code>@ViewBag.Email</code></p>
+                <p><strong>Contraseña:</strong> <code>Admin2024!</code></p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <h4>❌ Usuario NO Encontrado</h4>
+            <p>El usuario admin@gmail.com no existe en la base de datos.</p>
+        </div>
+    }
+    
+    <div class="mt-4">
+        <a href="/Identity/Account/Login" class="btn btn-primary">Ir a Login</a>
+        <a href="/" class="btn btn-secondary">Volver al Inicio</a>
+    </div>
+</div>

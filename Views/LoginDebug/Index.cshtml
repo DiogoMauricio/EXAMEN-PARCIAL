@@ -1,0 +1,150 @@
+@{
+    ViewData["Title"] = "Debug de Login";
+}
+
+<div class="container mt-4">
+    <h1>🐛 Debug de Login</h1>
+    
+    <!-- Test de Login Paso a Paso -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Test de Login Detallado</h5>
+                </div>
+                <div class="card-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" value="admin@gmail.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" value="admin123">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="testLogin()">Test Login</button>
+                        <button type="button" class="btn btn-success" onclick="fillTest()">Usar test@test.com</button>
+                    </form>
+                    
+                    <div id="loginResult" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5>Lista de Usuarios</h5>
+                </div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-info" onclick="listUsers()">Listar Usuarios</button>
+                    <div id="usersList" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logs en Tiempo Real -->
+    <div class="card mt-4">
+        <div class="card-header bg-warning text-dark">
+            <h5>Información Detallada</h5>
+        </div>
+        <div class="card-body">
+            <div id="debugInfo"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fillTest() {
+    document.getElementById('email').value = 'test@test.com';
+    document.getElementById('password').value = '1234';
+}
+
+function testLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    document.getElementById('loginResult').innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Probando login...';
+    
+    fetch('/LoginDebug/TestLogin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        let html = '';
+        if (data.success) {
+            html = `<div class="alert alert-success">
+                <h6>✅ ${data.message}</h6>
+                <a href="${data.redirectUrl}" class="btn btn-success btn-sm">Ir al Inicio</a>
+            </div>`;
+        } else {
+            html = `<div class="alert alert-danger">
+                <h6>❌ ${data.message}</h6>
+            </div>`;
+        }
+        
+        if (data.details) {
+            html += `<div class="mt-3">
+                <h6>Detalles:</h6>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Email:</strong> ${data.details.Email}</li>
+                    <li class="list-group-item"><strong>Password:</strong> ${data.details.Password}</li>
+                    <li class="list-group-item"><strong>Usuario Existe:</strong> ${data.details.UserExists ? '✅' : '❌'}</li>
+                    <li class="list-group-item"><strong>Contraseña Válida:</strong> ${data.details.PasswordValid ? '✅' : '❌'}</li>
+                    <li class="list-group-item"><strong>Resultado Login:</strong> ${data.details.LoginResult}</li>
+                    <li class="list-group-item"><strong>Detalles Usuario:</strong> ${data.details.UserDetails}</li>
+                    ${data.details.Error ? `<li class="list-group-item text-danger"><strong>Error:</strong> ${data.details.Error}</li>` : ''}
+                </ul>
+            </div>`;
+        }
+        
+        document.getElementById('loginResult').innerHTML = html;
+    })
+    .catch(error => {
+        document.getElementById('loginResult').innerHTML = `<div class="alert alert-danger">Error: ${error}</div>`;
+    });
+}
+
+function listUsers() {
+    document.getElementById('usersList').innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div>Cargando usuarios...';
+    
+    fetch('/LoginDebug/ListUsers', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            let html = '<div class="table-responsive"><table class="table table-sm">';
+            html += '<thead><tr><th>Email</th><th>Username</th><th>Roles</th><th>admin123</th><th>1234</th></tr></thead><tbody>';
+            
+            data.users.forEach(user => {
+                html += `<tr>
+                    <td>${user.Email}</td>
+                    <td>${user.UserName}</td>
+                    <td>${user.Roles.join(', ')}</td>
+                    <td>${user.PasswordAdmin123 ? '✅' : '❌'}</td>
+                    <td>${user.Password1234 ? '✅' : '❌'}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table></div>';
+            document.getElementById('usersList').innerHTML = html;
+        } else {
+            document.getElementById('usersList').innerHTML = `<div class="alert alert-danger">Error: ${data.message}</div>`;
+        }
+    })
+    .catch(error => {
+        document.getElementById('usersList').innerHTML = `<div class="alert alert-danger">Error: ${error}</div>`;
+    });
+}
+
+// Auto-cargar usuarios al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    listUsers();
+});
+</script>

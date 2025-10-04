@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "Login Simple";
+}
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white text-center">
+                    <h4><i class="fas fa-sign-in-alt me-2"></i>Login Simple</h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(ViewBag.Error))
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>@ViewBag.Error
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100 mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                        </button>
+                    </form>
+
+                    <hr>
+
+                    <div class="text-center">
+                        <h6>Credenciales de Prueba:</h6>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="btn btn-outline-primary btn-sm w-100 mb-2" 
+                                        onclick="fillCredentials('admin@test.com', '123456')">
+                                    👑 Coordinador
+                                </button>
+                                <small class="text-muted d-block">admin@test.com<br>123456</small>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-info btn-sm w-100 mb-2" 
+                                        onclick="fillCredentials('student@test.com', '123456')">
+                                    👤 Estudiante
+                                </button>
+                                <small class="text-muted d-block">student@test.com<br>123456</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">
+                        <a href="/LoginDebug">🐛 Debug</a> | 
+                        <a href="/Diagnostico">🔧 Diagnóstico</a> | 
+                        <a href="/">🏠 Inicio</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fillCredentials(email, password) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = password;
+}
+</script>

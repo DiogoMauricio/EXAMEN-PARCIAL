@@ -1,0 +1,183 @@
+@model IEnumerable<examen_parcial.Models.Curso>
+
+@{
+    ViewData["Title"] = "Catálogo de Cursos";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5">
+        <i class="fas fa-book me-2 text-primary"></i>Catálogo de Cursos
+    </h1>
+    <span class="badge bg-info fs-6">@Model.Count() curso(s) disponible(s)</span>
+</div>
+
+<!-- Panel de Filtros -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filtros de Búsqueda
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="nombre" class="form-label">
+                    <i class="fas fa-search me-1"></i>Nombre o Código
+                </label>
+                <input type="text" class="form-control" id="nombre" name="nombre" 
+                       value="@ViewBag.NombreFiltro" placeholder="Buscar curso...">
+            </div>
+            
+            <div class="col-md-2">
+                <label for="creditosMin" class="form-label">
+                    <i class="fas fa-arrow-up me-1"></i>Créditos Mín.
+                </label>
+                <input type="number" class="form-control" id="creditosMin" name="creditosMin" 
+                       value="@ViewBag.CreditosMinFiltro" min="0" max="20">
+            </div>
+            
+            <div class="col-md-2">
+                <label for="creditosMax" class="form-label">
+                    <i class="fas fa-arrow-down me-1"></i>Créditos Máx.
+                </label>
+                <input type="number" class="form-control" id="creditosMax" name="creditosMax" 
+                       value="@ViewBag.CreditosMaxFiltro" min="0" max="20">
+            </div>
+            
+            <div class="col-md-2">
+                <label for="horarioInicio" class="form-label">
+                    <i class="fas fa-clock me-1"></i>Hora Inicio
+                </label>
+                <input type="time" class="form-control" id="horarioInicio" name="horarioInicio" 
+                       value="@ViewBag.HorarioInicioFiltro">
+            </div>
+            
+            <div class="col-md-2">
+                <label for="horarioFin" class="form-label">
+                    <i class="fas fa-clock me-1"></i>Hora Fin
+                </label>
+                <input type="time" class="form-control" id="horarioFin" name="horarioFin" 
+                       value="@ViewBag.HorarioFinFiltro">
+            </div>
+            
+            <div class="col-md-1 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Cursos -->
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var curso in Model)
+        {
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card h-100 shadow-sm curso-card">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary fs-6">@curso.Codigo</span>
+                        <span class="badge bg-success">@curso.Creditos crédito(s)</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">@curso.Nombre</h5>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted d-block">
+                                <i class="fas fa-clock me-1"></i>
+                                Horario: @curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")
+                            </small>
+                        </div>
+                        
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <div class="border-end">
+                                    <div class="h4 mb-0 text-success">@curso.CuposDisponibles</div>
+                                    <small class="text-muted">Disponibles</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 mb-0 text-primary">@curso.CupoMaximo</div>
+                                <small class="text-muted">Total</small>
+                            </div>
+                        </div>
+                        
+                        <div class="progress mb-3" style="height: 8px;">
+                            @{
+                                var porcentajeOcupado = curso.CupoMaximo > 0 ? 
+                                    ((double)(curso.CupoMaximo - curso.CuposDisponibles) / curso.CupoMaximo) * 100 : 0;
+                                var claseProgress = porcentajeOcupado >= 90 ? "bg-danger" : 
+                                                  porcentajeOcupado >= 70 ? "bg-warning" : "bg-success";
+                            }
+                            <div class="progress-bar @claseProgress" role="progressbar" 
+                                 style="width: @porcentajeOcupado.ToString("F1")%"
+                                 aria-valuenow="@porcentajeOcupado" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="@Url.Action("Details", new { id = curso.Id })" 
+                           class="btn btn-primary w-100">
+                            <i class="fas fa-eye me-2"></i>Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-search fa-4x text-muted"></i>
+        </div>
+        <h4 class="text-muted">No se encontraron cursos</h4>
+        <p class="text-muted">No hay cursos que coincidan con los filtros aplicados.</p>
+        <a href="@Url.Action("Index")" class="btn btn-primary">
+            <i class="fas fa-refresh me-2"></i>Ver Todos los Cursos
+        </a>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Validación client-side para filtros
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const creditosMin = parseInt(document.getElementById('creditosMin').value) || 0;
+            const creditosMax = parseInt(document.getElementById('creditosMax').value) || 999;
+            
+            if (creditosMin < 0) {
+                alert('Los créditos mínimos no pueden ser negativos.');
+                e.preventDefault();
+                return;
+            }
+            
+            if (creditosMax < 0) {
+                alert('Los créditos máximos no pueden ser negativos.');
+                e.preventDefault();
+                return;
+            }
+            
+            if (creditosMin > creditosMax) {
+                alert('Los créditos mínimos no pueden ser mayores que los máximos.');
+                e.preventDefault();
+                return;
+            }
+            
+            const horarioInicio = document.getElementById('horarioInicio').value;
+            const horarioFin = document.getElementById('horarioFin').value;
+            
+            if (horarioInicio && horarioFin && horarioInicio >= horarioFin) {
+                alert('La hora de inicio debe ser anterior a la hora de fin.');
+                e.preventDefault();
+                return;
+            }
+        });
+    </script>
+}

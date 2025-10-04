@@ -10,17 +10,39 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 
+// Configuración simple de Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => 
 {
+    // Configuración de login
     options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    
+    // Configuración de password - MUY SIMPLE
     options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 4;
+    options.Password.RequiredLength = 1;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
+    options.Password.RequiredUniqueChars = 0;
+    
+    // Configuración de usuario
+    options.User.RequireUniqueEmail = true;
+    
+    // Configuración de lockout
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 10;
+    options.Lockout.AllowedForNewUsers = false;
 })
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// Configurar las rutas de autenticación para usar SimpleLogin
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/SimpleLogin";
+    options.LogoutPath = "/SimpleLogin/Logout";
+    options.AccessDeniedPath = "/SimpleLogin";
+});
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

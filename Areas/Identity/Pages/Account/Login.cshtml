@@ -62,15 +62,32 @@
         
         <!-- Información de usuarios de prueba -->
         <div class="card mt-4">
-            <div class="card-header bg-info text-white">
+            <div class="card-header bg-success text-white">
                 <h6 class="mb-0">
-                    <i class="fas fa-info-circle me-2"></i>Usuario de Prueba
+                    <i class="fas fa-info-circle me-2"></i>Credenciales de Acceso
                 </h6>
             </div>
             <div class="card-body">
-                <p class="mb-2"><strong>Coordinador:</strong></p>
-                <p class="mb-1">📧 Email: <code>admin@gmail.com</code></p>
-                <p class="mb-0">🔑 Contraseña: <code>Admin2024!</code></p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-2"><strong>👑 Coordinador:</strong></p>
+                        <p class="mb-1">📧 Email: <code>admin@test.com</code></p>
+                        <p class="mb-2">🔑 Contraseña: <code>123456</code></p>
+                        <button class="btn btn-outline-primary btn-sm" 
+                                onclick="document.getElementById('Input_Email').value='admin@test.com'; document.getElementById('Input_Password').value='123456';">
+                            Usar estas credenciales
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2"><strong>👤 Estudiante:</strong></p>
+                        <p class="mb-1">📧 Email: <code>student@test.com</code></p>
+                        <p class="mb-2">🔑 Contraseña: <code>123456</code></p>
+                        <button class="btn btn-outline-info btn-sm" 
+                                onclick="document.getElementById('Input_Email').value='student@test.com'; document.getElementById('Input_Password').value='123456';">
+                            Usar estas credenciales
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

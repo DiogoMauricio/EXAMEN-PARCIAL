@@ -1,0 +1,205 @@
+@model examen_parcial.Models.Curso
+
+@{
+    ViewData["Title"] = $"Curso: {Model.Nombre}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Home")">
+                        <i class="fas fa-home me-1"></i>Inicio
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index")">
+                        <i class="fas fa-book me-1"></i>Catálogo
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.Codigo</li>
+            </ol>
+        </nav>
+
+        <!-- Encabezado del Curso -->
+        <div class="card shadow-lg mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="h3 mb-0">@Model.Nombre</h1>
+                        <small class="opacity-75">Código: @Model.Codigo</small>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge bg-light text-primary fs-5">
+                            @Model.Creditos Crédito(s)
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Información del Horario -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-clock fa-lg text-primary me-3"></i>
+                            <div>
+                                <strong>Horario de Clases</strong>
+                                <div class="text-muted">
+                                    @Model.HorarioInicio.ToString(@"hh\:mm") - @Model.HorarioFin.ToString(@"hh\:mm")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-calendar fa-lg text-success me-3"></i>
+                            <div>
+                                <strong>Duración</strong>
+                                <div class="text-muted">
+                                    @{
+                                        var duracion = Model.HorarioFin - Model.HorarioInicio;
+                                        var horas = (int)duracion.TotalHours;
+                                        var minutos = duracion.Minutes;
+                                    }
+                                    @horas h @minutos min por sesión
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Cupos -->
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-users me-2 text-info"></i>Disponibilidad de Cupos
+                        </h5>
+                        
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="h2 mb-0 text-success">@Model.CuposDisponibles</div>
+                                <small class="text-muted">Disponibles</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="h2 mb-0 text-primary">@Model.CupoMaximo</div>
+                                <small class="text-muted">Total</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="h2 mb-0 text-warning">@(Model.CupoMaximo - Model.CuposDisponibles)</div>
+                                <small class="text-muted">Ocupados</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            @{
+                                var porcentajeOcupado = Model.CupoMaximo > 0 ? 
+                                    ((double)(Model.CupoMaximo - Model.CuposDisponibles) / Model.CupoMaximo) * 100 : 0;
+                                var claseProgress = porcentajeOcupado >= 90 ? "bg-danger" : 
+                                                  porcentajeOcupado >= 70 ? "bg-warning" : "bg-success";
+                                var textoEstado = porcentajeOcupado >= 90 ? "Casi lleno" :
+                                                porcentajeOcupado >= 70 ? "Cupos limitados" : "Cupos disponibles";
+                            }
+                            <div class="progress" style="height: 12px;">
+                                <div class="progress-bar @claseProgress" role="progressbar" 
+                                     style="width: @porcentajeOcupado.ToString("F1")%"
+                                     aria-valuenow="@porcentajeOcupado" aria-valuemin="0" aria-valuemax="100">
+                                    @porcentajeOcupado.ToString("F1")%
+                                </div>
+                            </div>
+                            <div class="text-center mt-2">
+                                <small class="fw-bold">@textoEstado</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado de Matrícula del Usuario -->
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var tieneMatricula = ViewBag.TieneMatricula as bool? ?? false;
+                    var estadoMatricula = ViewBag.EstadoMatricula as string;
+                    
+                    <div class="card border-info mb-4">
+                        <div class="card-body text-center">
+                            @if (tieneMatricula)
+                            {
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle fa-lg me-2"></i>
+                                    <strong>Ya estás matriculado en este curso</strong>
+                                    <div class="mt-1">
+                                        Estado: <span class="badge bg-secondary">@estadoMatricula</span>
+                                    </div>
+                                </div>
+                            }
+                            else if (Model.CuposDisponibles <= 0)
+                            {
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle fa-lg me-2"></i>
+                                    <strong>No hay cupos disponibles</strong>
+                                    <div class="mt-1">Este curso ha alcanzado su capacidad máxima</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-graduation-cap me-2"></i>¡Inscríbete ahora!
+                                </h5>
+                                <p class="mb-3">Este curso tiene cupos disponibles para tu inscripción.</p>
+                                
+                                <form asp-action="Inscribirse" method="post" class="d-inline">
+                                    <input type="hidden" name="cursoId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fas fa-user-plus me-2"></i>Inscribirse al Curso
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="card border-warning mb-4">
+                        <div class="card-body text-center">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-sign-in-alt fa-lg me-2"></i>
+                                <strong>Inicia sesión para inscribirte</strong>
+                                <div class="mt-2">
+                                    <a href="@Url.Page("/Account/Login", new { area = "Identity" })" 
+                                       class="btn btn-primary">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Navegación -->
+                <div class="text-center">
+                    <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver al Catálogo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Confirmación de inscripción
+        document.addEventListener('DOMContentLoaded', function() {
+            const formInscripcion = document.querySelector('form[action*="Inscribirse"]');
+            if (formInscripcion) {
+                formInscripcion.addEventListener('submit', function(e) {
+                    if (!confirm('¿Estás seguro de que deseas inscribirte en este curso?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+}

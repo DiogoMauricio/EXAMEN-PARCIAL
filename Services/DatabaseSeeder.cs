@@ -21,30 +21,70 @@ namespace examen_parcial.Services
             if (!await roleManager.RoleExistsAsync("Coordinador"))
             {
                 await roleManager.CreateAsync(new IdentityRole("Coordinador"));
+                Console.WriteLine("Rol Coordinador creado");
             }
 
             if (!await roleManager.RoleExistsAsync("Estudiante"))
             {
                 await roleManager.CreateAsync(new IdentityRole("Estudiante"));
+                Console.WriteLine("Rol Estudiante creado");
             }
 
-            // Crear usuario coordinador
-            var coordinadorEmail = "admin@gmail.com";
-            var coordinador = await userManager.FindByEmailAsync(coordinadorEmail);
-            
-            if (coordinador == null)
+            // Usuario 1: Coordinador simple
+            var coord = await userManager.FindByEmailAsync("admin@test.com");
+            if (coord == null)
             {
-                coordinador = new IdentityUser
+                coord = new IdentityUser
                 {
-                    UserName = coordinadorEmail,
-                    Email = coordinadorEmail,
-                    EmailConfirmed = true
+                    UserName = "admin@test.com",
+                    Email = "admin@test.com",
+                    EmailConfirmed = true,
+                    NormalizedEmail = "ADMIN@TEST.COM",
+                    NormalizedUserName = "ADMIN@TEST.COM"
                 };
 
-                var result = await userManager.CreateAsync(coordinador, "Admin2024!");
+                var result = await userManager.CreateAsync(coord, "123456");
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(coordinador, "Coordinador");
+                    await userManager.AddToRoleAsync(coord, "Coordinador");
+                    Console.WriteLine("✅ Coordinador creado: admin@test.com / 123456");
+                }
+                else
+                {
+                    Console.WriteLine("❌ Error creando coordinador:");
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"   {error.Description}");
+                    }
+                }
+            }
+
+            // Usuario 2: Estudiante simple
+            var student = await userManager.FindByEmailAsync("student@test.com");
+            if (student == null)
+            {
+                student = new IdentityUser
+                {
+                    UserName = "student@test.com",
+                    Email = "student@test.com",
+                    EmailConfirmed = true,
+                    NormalizedEmail = "STUDENT@TEST.COM",
+                    NormalizedUserName = "STUDENT@TEST.COM"
+                };
+
+                var result = await userManager.CreateAsync(student, "123456");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(student, "Estudiante");
+                    Console.WriteLine("✅ Estudiante creado: student@test.com / 123456");
+                }
+                else
+                {
+                    Console.WriteLine("❌ Error creando estudiante:");
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"   {error.Description}");
+                    }
                 }
             }
 
@@ -59,8 +99,8 @@ namespace examen_parcial.Services
                         Nombre = "Introducción a la Programación",
                         Creditos = 4,
                         CupoMaximo = 30,
-                        HorarioInicio = new TimeSpan(8, 0, 0), // 8:00 AM
-                        HorarioFin = new TimeSpan(10, 0, 0),   // 10:00 AM
+                        HorarioInicio = new TimeSpan(8, 0, 0),
+                        HorarioFin = new TimeSpan(10, 0, 0),
                         Activo = true
                     },
                     new Curso
@@ -69,8 +109,8 @@ namespace examen_parcial.Services
                         Nombre = "Estructura de Datos",
                         Creditos = 4,
                         CupoMaximo = 25,
-                        HorarioInicio = new TimeSpan(10, 30, 0), // 10:30 AM
-                        HorarioFin = new TimeSpan(12, 30, 0),    // 12:30 PM
+                        HorarioInicio = new TimeSpan(10, 30, 0),
+                        HorarioFin = new TimeSpan(12, 30, 0),
                         Activo = true
                     },
                     new Curso
@@ -79,15 +119,20 @@ namespace examen_parcial.Services
                         Nombre = "Base de Datos",
                         Creditos = 3,
                         CupoMaximo = 20,
-                        HorarioInicio = new TimeSpan(14, 0, 0), // 2:00 PM
-                        HorarioFin = new TimeSpan(16, 0, 0),    // 4:00 PM
+                        HorarioInicio = new TimeSpan(14, 0, 0),
+                        HorarioFin = new TimeSpan(16, 0, 0),
                         Activo = true
                     }
                 };
 
                 context.Cursos.AddRange(cursos);
                 await context.SaveChangesAsync();
+                Console.WriteLine("✅ Cursos creados");
             }
+
+            Console.WriteLine("\n🎯 CREDENCIALES DE ACCESO:");
+            Console.WriteLine("👑 Coordinador: admin@test.com / 123456");
+            Console.WriteLine("👤 Estudiante: student@test.com / 123456");
         }
     }
 }
