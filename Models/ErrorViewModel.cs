@@ -1,4 +1,4 @@
-namespace ExamenParcial.Models;
+namespace examen_parcial.Models;
 
 public class ErrorViewModel
 {

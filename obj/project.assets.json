@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Desktop\\examen parcial\\ExamenParcial\\ExamenParcial.csproj",
-      "projectName": "ExamenParcial",
-      "projectPath": "C:\\Users\\User\\Desktop\\examen parcial\\ExamenParcial\\ExamenParcial.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Desktop\\examen parcial\\examen parcial.csproj",
+      "projectName": "examen parcial",
+      "projectPath": "C:\\Users\\User\\Desktop\\examen parcial\\examen parcial.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Desktop\\examen parcial\\ExamenParcial\\obj\\",
+      "outputPath": "C:\\Users\\User\\Desktop\\examen parcial\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"

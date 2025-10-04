@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using ExamenParcial.Models;
+using examen_parcial.Models;
 
-namespace ExamenParcial.Controllers;
+namespace examen_parcial.Controllers;
 
 public class HomeController : Controller
 {
