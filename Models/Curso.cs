@@ -14,6 +14,9 @@ namespace examen_parcial.Models
         [StringLength(200)]
         public string Nombre { get; set; } = string.Empty;
 
+        [StringLength(500)]
+        public string? Descripcion { get; set; }
+
         [Range(1, 20, ErrorMessage = "Los créditos deben ser mayor a 0")]
         public int Creditos { get; set; }
 

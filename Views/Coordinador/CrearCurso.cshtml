@@ -1,0 +1,138 @@
+@model examen_parcial.Models.Curso
+
+@{
+    ViewData["Title"] = "Crear Nuevo Curso";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5">
+        <i class="fas fa-plus-circle me-2 text-success"></i>Crear Nuevo Curso
+    </h1>
+    <a href="@Url.Action("Cursos")" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Volver a la Lista
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Información del Curso</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="CrearCurso" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Codigo" class="form-label">Código del Curso *</label>
+                            <input asp-for="Codigo" class="form-control" placeholder="Ej: CS101" required />
+                            <span asp-validation-for="Codigo" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Creditos" class="form-label">Créditos *</label>
+                            <input asp-for="Creditos" type="number" min="1" max="10" class="form-control" required />
+                            <span asp-validation-for="Creditos" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label">Nombre del Curso *</label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Introducción a la Programación" required />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label">Descripción</label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3" 
+                                  placeholder="Descripción detallada del curso..."></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="HorarioInicio" class="form-label">Hora de Inicio *</label>
+                            <input asp-for="HorarioInicio" type="time" class="form-control" required />
+                            <span asp-validation-for="HorarioInicio" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="HorarioFin" class="form-label">Hora de Fin *</label>
+                            <input asp-for="HorarioFin" type="time" class="form-control" required />
+                            <span asp-validation-for="HorarioFin" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="CupoMaximo" class="form-label">Cupo Máximo *</label>
+                            <input asp-for="CupoMaximo" type="number" min="1" max="500" class="form-control" required />
+                            <span asp-validation-for="CupoMaximo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input asp-for="Activo" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="Activo" class="form-check-label">
+                                Curso activo (disponible para matrículas)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="@Url.Action("Cursos")" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Crear Curso
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Información Importante
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-lightbulb me-2"></i>Consejos:</h6>
+                    <ul class="mb-0 small">
+                        <li>El código debe ser único en el sistema</li>
+                        <li>Los créditos van de 1 a 10</li>
+                        <li>Verifica que el horario no se superponga con otros cursos</li>
+                        <li>El cupo máximo puede modificarse después</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Validaciones:</h6>
+                    <ul class="mb-0 small">
+                        <li>La hora de fin debe ser posterior a la de inicio</li>
+                        <li>El curso estará disponible inmediatamente si está activo</li>
+                        <li>Los campos marcados con * son obligatorios</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Validación personalizada del horario
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var inicio = document.querySelector('input[name="HorarioInicio"]').value;
+            var fin = document.querySelector('input[name="HorarioFin"]').value;
+            
+            if (inicio && fin && inicio >= fin) {
+                e.preventDefault();
+                alert('La hora de fin debe ser posterior a la hora de inicio.');
+                return false;
+            }
+        });
+    </script>
+}

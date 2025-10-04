@@ -14,7 +14,7 @@ namespace examen_parcial.Models
         [Required]
         public string UsuarioId { get; set; } = string.Empty;
 
-        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public DateTime FechaMatricula { get; set; } = DateTime.Now;
 
         [Required]
         public EstadoMatricula Estado { get; set; } = EstadoMatricula.Pendiente;
@@ -25,5 +25,9 @@ namespace examen_parcial.Models
 
         [ForeignKey("UsuarioId")]
         public virtual IdentityUser Usuario { get; set; } = null!;
+
+        // Propiedades calculadas para facilitar el acceso en las vistas
+        public string NombreEstudiante => Usuario?.UserName ?? "Usuario desconocido";
+        public string EmailEstudiante => Usuario?.Email ?? "Email no disponible";
     }
 }

@@ -1,0 +1,136 @@
+@model IEnumerable<examen_parcial.Models.Curso>
+
+@{
+    ViewData["Title"] = "Gestión de Cursos";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5">
+        <i class="fas fa-graduation-cap me-2 text-primary"></i>Gestión de Cursos
+    </h1>
+    <div>
+        <a href="@Url.Action("CrearCurso")" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Crear Nuevo Curso
+        </a>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Panel
+        </a>
+    </div>
+</div>
+
+<!-- Mensajes de Feedback -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Tabla de Cursos -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Todos los Cursos (@Model.Count())</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Créditos</th>
+                            <th>Horario</th>
+                            <th>Cupos</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var curso in Model)
+                        {
+                            <tr class="@(curso.Activo ? "" : "table-secondary")">
+                                <td>
+                                    <strong>@curso.Codigo</strong>
+                                </td>
+                                <td>@curso.Nombre</td>
+                                <td>
+                                    <span class="badge bg-info">@curso.Creditos</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        @curso.HorarioInicio.ToString(@"hh\:mm") - @curso.HorarioFin.ToString(@"hh\:mm")
+                                    </small>
+                                </td>
+                                <td>
+                                    @{
+                                        var ocupados = curso.Matriculas.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Confirmada);
+                                        var pendientes = curso.Matriculas.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Pendiente);
+                                    }
+                                    <small>
+                                        <strong>@ocupados/@curso.CupoMaximo</strong>
+                                        @if (pendientes > 0)
+                                        {
+                                            <br><span class="text-warning">(@pendientes pendientes)</span>
+                                        }
+                                    </small>
+                                </td>
+                                <td>
+                                    @if (curso.Activo)
+                                    {
+                                        <span class="badge bg-success">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("EditarCurso", new { id = curso.Id })" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="@Url.Action("Matriculas", new { cursoId = curso.Id })" 
+                                           class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-users"></i>
+                                        </a>
+                                        <form asp-action="DesactivarCurso" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@curso.Id" />
+                                            <button type="submit" 
+                                                    class="btn btn-outline-@(curso.Activo ? "warning" : "success") btn-sm"
+                                                    onclick="return confirm('@(curso.Activo ? "¿Desactivar" : "¿Activar") el curso @curso.Nombre?')">
+                                                <i class="fas fa-@(curso.Activo ? "eye-slash" : "eye")"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No hay cursos registrados</h5>
+                <p class="text-muted">Comienza creando tu primer curso.</p>
+                <a href="@Url.Action("CrearCurso")" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Crear Primer Curso
+                </a>
+            </div>
+        }
+    </div>
+</div>

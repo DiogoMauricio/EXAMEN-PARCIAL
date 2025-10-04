@@ -1,0 +1,145 @@
+@{
+    ViewData["Title"] = "Panel de Coordinador";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5">
+            <i class="fas fa-user-cog me-2 text-primary"></i>Panel de Coordinador
+        </h1>
+        <p class="lead text-muted">Gestión completa de cursos y matrículas del portal académico</p>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Total Cursos</h5>
+                        <h2 class="mb-0">@ViewBag.TotalCursos</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-book fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Cursos Activos</h5>
+                        <h2 class="mb-0">@ViewBag.CursosActivos</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Pendientes</h5>
+                        <h2 class="mb-0">@ViewBag.MatriculasPendientes</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Confirmadas</h5>
+                        <h2 class="mb-0">@ViewBag.MatriculasConfirmadas</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-graduation-cap me-2"></i>Gestión de Cursos
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Administra el catálogo de cursos: crear, editar y activar/desactivar cursos.</p>
+                <div class="d-grid gap-2">
+                    <a href="@Url.Action("CrearCurso")" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Crear Nuevo Curso
+                    </a>
+                    <a href="@Url.Action("Cursos")" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-2"></i>Ver Todos los Cursos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-users me-2"></i>Gestión de Matrículas
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Revisa y gestiona las solicitudes de matrícula de los estudiantes.</p>
+                <div class="d-grid gap-2">
+                    <a href="@Url.Action("Matriculas")" class="btn btn-warning">
+                        <i class="fas fa-eye me-2"></i>Ver Todas las Matrículas
+                    </a>
+                    @if (ViewBag.MatriculasPendientes > 0)
+                    {
+                        <a href="@Url.Action("Matriculas")#pendientes" class="btn btn-outline-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @ViewBag.MatriculasPendientes Pendientes de Revisión
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mensajes de Feedback -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}

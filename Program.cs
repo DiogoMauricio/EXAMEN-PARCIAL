@@ -56,7 +56,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/SimpleLogin";
     options.LogoutPath = "/SimpleLogin/Logout";
-    options.AccessDeniedPath = "/SimpleLogin";
+    options.AccessDeniedPath = "/Home/AccessDenied";
 });
 
 builder.Services.AddControllersWithViews();

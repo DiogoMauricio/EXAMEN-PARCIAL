@@ -1,0 +1,342 @@
+@model IEnumerable<examen_parcial.Models.Matricula>
+
+@{
+    ViewData["Title"] = "Gestión de Matrículas";
+    var curso = ViewBag.Curso as examen_parcial.Models.Curso;
+    var tituloSeccion = ViewBag.TituloSeccion as string ?? "Gestión de Matrículas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-5">
+            <i class="fas fa-users me-2 text-info"></i>@tituloSeccion
+        </h1>
+        @if (curso != null)
+        {
+            <h6 class="text-muted">
+                <i class="fas fa-graduation-cap me-2"></i>@curso.Codigo - @curso.Nombre
+            </h6>
+        }
+    </div>
+    <div>
+        @if (curso != null)
+        {
+            <a href="@Url.Action("EditarCurso", new { id = curso.Id })" class="btn btn-outline-primary">
+                <i class="fas fa-edit me-2"></i>Editar Curso
+            </a>
+        }
+        <a href="@Url.Action("Cursos")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a Cursos
+        </a>
+        <a href="@Url.Action("Index")" class="btn btn-outline-info">
+            <i class="fas fa-home me-2"></i>Panel Principal
+        </a>
+    </div>
+</div>
+
+<!-- Resumen -->
+<div class="row mb-4">
+    @if (curso != null)
+    {
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-primary">@curso.CupoMaximo</h4>
+                    <small class="text-muted">Cupo Máximo</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-success">@Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Confirmada)</h4>
+                    <small class="text-muted">Confirmadas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-warning">@Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Pendiente)</h4>
+                    <small class="text-muted">Pendientes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    @{
+                        var disponibles = curso.CupoMaximo - Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Confirmada);
+                    }
+                    <h4 class="text-@(disponibles > 0 ? "info" : "danger")">@disponibles</h4>
+                    <small class="text-muted">Disponibles</small>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Resumen general de todas las matrículas -->
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-primary">@Model.Count()</h4>
+                    <small class="text-muted">Total Matrículas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-success">@Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Confirmada)</h4>
+                    <small class="text-muted">Confirmadas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-warning">@Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Pendiente)</h4>
+                    <small class="text-muted">Pendientes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-danger">@Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Cancelada)</h4>
+                    <small class="text-muted">Canceladas</small>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (curso == null)
+{
+    <!-- Filtro por curso cuando se muestran todas las matrículas -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Filtrar por Curso
+                    </h6>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex gap-2">
+                        @{
+                            var cursos = ViewBag.Cursos as List<examen_parcial.Models.Curso>;
+                        }
+                        <select class="form-select" id="cursoFilter" onchange="filtrarPorCurso()">
+                            <option value="">Todos los cursos</option>
+                            @if (cursos != null)
+                            {
+                                @foreach (var c in cursos)
+                                {
+                                    <option value="@c.Id">@c.Codigo - @c.Nombre</option>
+                                }
+                            }
+                        </select>
+                        <a href="@Url.Action("Matriculas")" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-refresh"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Mensajes de Feedback -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Filtros de Estado -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h5 class="mb-0">Matrículas (@Model.Count())</h5>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-2 justify-content-end">
+                    <button class="btn btn-outline-secondary btn-sm filter-btn active" data-filter="all">
+                        Todas (@Model.Count())
+                    </button>
+                    <button class="btn btn-outline-warning btn-sm filter-btn" data-filter="pendiente">
+                        Pendientes (@Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Pendiente))
+                    </button>
+                    <button class="btn btn-outline-success btn-sm filter-btn" data-filter="confirmada">
+                        Confirmadas (@Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Confirmada))
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm filter-btn" data-filter="cancelada">
+                        Canceladas (@Model.Count(m => m.Estado == examen_parcial.Models.EstadoMatricula.Cancelada))
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Matrículas -->
+<div class="card">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            @if (curso == null)
+                            {
+                                <th>Curso</th>
+                            }
+                            <th>Estudiante</th>
+                            <th>Email</th>
+                            <th>Fecha Matrícula</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var matricula in Model.OrderBy(m => m.FechaMatricula))
+                        {
+                            <tr class="matricula-row" data-estado="@matricula.Estado.ToString().ToLower()" data-curso="@matricula.CursoId">
+                                @if (curso == null)
+                                {
+                                    <td>
+                                        <strong class="text-primary">@matricula.Curso.Codigo</strong>
+                                        <br><small class="text-muted">@matricula.Curso.Nombre</small>
+                                    </td>
+                                }
+                                <td>
+                                    <strong>@matricula.NombreEstudiante</strong>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@matricula.EmailEstudiante</small>
+                                </td>
+                                <td>
+                                    <small>@matricula.FechaMatricula.ToString("dd/MM/yyyy HH:mm")</small>
+                                </td>
+                                <td>
+                                    @switch (matricula.Estado)
+                                    {
+                                        case examen_parcial.Models.EstadoMatricula.Pendiente:
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Pendiente
+                                            </span>
+                                            break;
+                                        case examen_parcial.Models.EstadoMatricula.Confirmada:
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Confirmada
+                                            </span>
+                                            break;
+                                        case examen_parcial.Models.EstadoMatricula.Cancelada:
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Cancelada
+                                            </span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @if (matricula.Estado == examen_parcial.Models.EstadoMatricula.Pendiente)
+                                    {
+                                        <div class="btn-group" role="group">
+                                            <form asp-action="CambiarEstadoMatricula" method="post" class="d-inline">
+                                                <input type="hidden" name="matriculaId" value="@matricula.Id" />
+                                                <input type="hidden" name="nuevoEstado" value="@((int)examen_parcial.Models.EstadoMatricula.Confirmada)" />
+                                                <button type="submit" class="btn btn-success btn-sm"
+                                                        onclick="return confirm('¿Confirmar la matrícula de @matricula.NombreEstudiante?')">
+                                                    <i class="fas fa-check"></i> Confirmar
+                                                </button>
+                                            </form>
+                                            <form asp-action="CambiarEstadoMatricula" method="post" class="d-inline">
+                                                <input type="hidden" name="matriculaId" value="@matricula.Id" />
+                                                <input type="hidden" name="nuevoEstado" value="@((int)examen_parcial.Models.EstadoMatricula.Cancelada)" />
+                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="return confirm('¿Cancelar la matrícula de @matricula.NombreEstudiante?')">
+                                                    <i class="fas fa-times"></i> Cancelar
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else if (matricula.Estado == examen_parcial.Models.EstadoMatricula.Confirmada)
+                                    {
+                                        <form asp-action="CambiarEstadoMatricula" method="post" class="d-inline">
+                                            <input type="hidden" name="matriculaId" value="@matricula.Id" />
+                                            <input type="hidden" name="nuevoEstado" value="@((int)examen_parcial.Models.EstadoMatricula.Cancelada)" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm"
+                                                    onclick="return confirm('¿Cancelar la matrícula confirmada de @matricula.NombreEstudiante?')">
+                                                <i class="fas fa-times"></i> Cancelar
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Sin acciones</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No hay matrículas para este curso</h5>
+                <p class="text-muted">Las matrículas aparecerán aquí cuando los estudiantes se inscriban.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Filtrado de matrículas por estado
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Actualizar botones activos
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                const rows = document.querySelectorAll('.matricula-row');
+                
+                rows.forEach(row => {
+                    if (filter === 'all' || row.dataset.estado === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Función para filtrar por curso
+        function filtrarPorCurso() {
+            const select = document.getElementById('cursoFilter');
+            if (select.value) {
+                window.location.href = '@Url.Action("Matriculas")?cursoId=' + select.value;
+            } else {
+                window.location.href = '@Url.Action("Matriculas")';
+            }
+        }
+    </script>
+}

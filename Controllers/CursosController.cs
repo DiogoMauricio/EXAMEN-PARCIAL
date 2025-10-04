@@ -184,7 +184,7 @@ namespace examen_parcial.Controllers
             {
                 CursoId = id,
                 UsuarioId = usuarioId,
-                FechaRegistro = DateTime.Now,
+                FechaMatricula = DateTime.Now,
                 Estado = EstadoMatricula.Pendiente // ESTADO PENDIENTE según requerimiento
             };
 
