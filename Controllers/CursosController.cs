@@ -80,13 +80,20 @@ namespace examen_parcial.Controllers
                 return NotFound();
             }
 
-            // Verificar si el usuario actual ya está matriculado
+            // Verificar el estado de matrícula del usuario actual
             ViewBag.YaMatriculado = false;
+            ViewBag.EstadoMatricula = "";
             if (User.Identity?.IsAuthenticated == true)
             {
                 var usuarioId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                ViewBag.YaMatriculado = await _context.Matriculas
-                    .AnyAsync(m => m.CursoId == id && m.UsuarioId == usuarioId);
+                var matriculaUsuario = await _context.Matriculas
+                    .FirstOrDefaultAsync(m => m.CursoId == id && m.UsuarioId == usuarioId);
+                
+                if (matriculaUsuario != null)
+                {
+                    ViewBag.YaMatriculado = true;
+                    ViewBag.EstadoMatricula = matriculaUsuario.Estado.ToString();
+                }
             }
 
             return View(curso);
@@ -102,16 +109,17 @@ namespace examen_parcial.Controllers
             if (curso == null || !curso.Activo)
             {
                 TempData["Error"] = "El curso no existe o no está activo.";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", new { id });
             }
 
             var usuarioId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (usuarioId == null)
             {
-                return Unauthorized();
+                TempData["Error"] = "Debe estar autenticado para inscribirse.";
+                return RedirectToAction("Details", new { id });
             }
 
-            // Verificar si ya está matriculado
+            // VALIDACIÓN 1: Verificar si ya está matriculado
             var matriculaExistente = await _context.Matriculas
                 .AnyAsync(m => m.CursoId == id && m.UsuarioId == usuarioId);
 
@@ -121,29 +129,51 @@ namespace examen_parcial.Controllers
                 return RedirectToAction("Details", new { id });
             }
 
-            // Verificar cupo disponible
-            var matriculasConfirmadas = await _context.Matriculas
-                .CountAsync(m => m.CursoId == id && m.Estado == EstadoMatricula.Confirmada);
+            // VALIDACIÓN 2: Verificar cupo máximo (incluyendo pendientes y confirmadas)
+            var matriculasOcupadas = await _context.Matriculas
+                .CountAsync(m => m.CursoId == id && 
+                    (m.Estado == EstadoMatricula.Confirmada || m.Estado == EstadoMatricula.Pendiente));
 
-            if (matriculasConfirmadas >= curso.CupoMaximo)
+            if (matriculasOcupadas >= curso.CupoMaximo)
             {
                 TempData["Error"] = "No hay cupos disponibles para este curso.";
                 return RedirectToAction("Details", new { id });
             }
 
-            // Crear nueva matrícula
+            // VALIDACIÓN 3: Verificar solapamiento de horarios
+            var cursosMatriculados = await _context.Matriculas
+                .Where(m => m.UsuarioId == usuarioId && 
+                    (m.Estado == EstadoMatricula.Confirmada || m.Estado == EstadoMatricula.Pendiente))
+                .Include(m => m.Curso)
+                .Select(m => m.Curso)
+                .ToListAsync();
+
+            var horarioSolapa = cursosMatriculados.Any(c => 
+                (curso.HorarioInicio < c.HorarioFin && curso.HorarioFin > c.HorarioInicio));
+
+            if (horarioSolapa)
+            {
+                var cursoConflicto = cursosMatriculados.First(c => 
+                    curso.HorarioInicio < c.HorarioFin && curso.HorarioFin > c.HorarioInicio);
+                
+                TempData["Error"] = $"Conflicto de horario con el curso '{cursoConflicto.Nombre}' " +
+                    $"({cursoConflicto.HorarioInicio:hh\\:mm} - {cursoConflicto.HorarioFin:hh\\:mm}).";
+                return RedirectToAction("Details", new { id });
+            }
+
+            // Crear nueva matrícula en estado PENDIENTE
             var matricula = new Matricula
             {
                 CursoId = id,
                 UsuarioId = usuarioId,
                 FechaRegistro = DateTime.Now,
-                Estado = EstadoMatricula.Confirmada
+                Estado = EstadoMatricula.Pendiente // ESTADO PENDIENTE según requerimiento
             };
 
             _context.Matriculas.Add(matricula);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Te has inscrito exitosamente en el curso '{curso.Nombre}'.";
+            TempData["Success"] = $"Tu solicitud de inscripción al curso '{curso.Nombre}' ha sido enviada y está pendiente de aprobación.";
             return RedirectToAction("Details", new { id });
         }
     }

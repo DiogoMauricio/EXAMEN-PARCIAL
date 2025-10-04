@@ -31,7 +31,8 @@ namespace examen_parcial.Models
         // Relaciones
         public virtual ICollection<Matricula> Matriculas { get; set; } = new List<Matricula>();
 
-        // Propiedad calculada para cupos disponibles
-        public int CuposDisponibles => CupoMaximo - Matriculas.Count(m => m.Estado == EstadoMatricula.Confirmada);
+        // Propiedad calculada para cupos disponibles (excluyendo pendientes y confirmadas)
+        public int CuposDisponibles => CupoMaximo - Matriculas.Count(m => 
+            m.Estado == EstadoMatricula.Confirmada || m.Estado == EstadoMatricula.Pendiente);
     }
 }
